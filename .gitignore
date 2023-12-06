@@ -1,32 +1,113 @@
-# Prerequisites
-*.d
+#include <Servo.h>
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+//Seting the servo
+int PinServoLeft = 9;
+int PinServoRight = 10;
 
-# Precompiled Headers
-*.gch
-*.pch
+Servo servoRight;
+Servo servoLeft;
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
+int ServoPosUp = 180;
+int ServoPosNormal =  90;
+int ServoPosDown =  0;
 
-# Fortran module files
-*.mod
-*.smod
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
+//Some other features 
+int PinButton = 8;
+int PinBuzzer = 11;
 
-# Executables
-*.exe
-*.out
-*.app
+int ButtonState = 0;
+int State = 0;
+
+// Seting up leds as eyes 
+int PinRightEye = 13;
+int PinLeftEye = 12;
+
+
+//Distance Sensor Setup 
+const int TrigPin = 5;
+const int EchoPin = 6;
+
+//Variables for distance sensor
+long duration;
+int distance;
+
+
+void setup() {
+Serial.begin(9600);
+
+//Setting distance sensor
+pinMode(TrigPin, OUTPUT);
+pinMode(EchoPin, INPUT);
+//Setting Servomoters
+pinMode(PinServoLeft,OUTPUT);
+pinMode(PinServoRight,OUTPUT);
+
+servoRight.attach(9);
+servoLeft.attach(10);
+
+servoRight.write(ServoPosNormal);
+servoLeft.write(ServoPosNormal);
+
+// setting other tools
+pinMode(PinBuzzer, OUTPUT);
+pinMode(PinButton,INPUT);
+pinMode(PinRightEye,OUTPUT);
+pinMode(PinLeftEye,OUTPUT);
+}
+
+void loop() {
+//by pushing the butto n 
+    Awake();
+}
+
+void Sleep()
+{
+  digitalWrite(PinRightEye,LOW);
+  digitalWrite(PinLeftEye,LOW);
+  servoRight.write(ServoPosDown);
+  servoLeft.write(ServoPosDown);
+
+}
+
+void Awake()
+{
+  digitalWrite(TrigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TrigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TrigPin, LOW);
+  long duration, inches;
+  duration = pulseIn(EchoPin, HIGH);
+  inches = duration/74/2;
+  Serial.println (inches);
+   // Sets the trigPin on HIGH state for 10 micro seconds
+ 
+
+ //Turning on his eyes 
+  digitalWrite(PinRightEye, HIGH);
+  digitalWrite(PinLeftEye, HIGH);
+
+  if (inches <=5)
+  {
+    servoRight.write(ServoPosUp);
+    servoLeft.write(ServoPosUp);
+    digitalWrite(PinBuzzer,HIGH);
+    delayMicroseconds(2);
+    digitalWrite(PinBuzzer,LOW);
+
+  }
+  else if (inches <10 && inches >5)
+  {
+    digitalWrite(PinRightEye, HIGH);
+    digitalWrite(PinLeftEye, LOW);
+    servoRight.write(ServoPosDown);
+    servoLeft.write(ServoPosDown);
+     
+  }
+  else if (inches >=10)
+  {
+  digitalWrite(PinRightEye, HIGH);
+  digitalWrite(PinLeftEye, LOW);
+    }
+  }
